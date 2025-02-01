@@ -1,0 +1,138 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+
+interface LibraryOperations {
+    void addBook(Book book);
+    void borrowBook(int bookId);
+    void returnBook(int bookId);
+    void viewBooks();
+}
+
+abstract class Book {
+    protected int bookId;
+    protected String title;
+    protected String author;
+
+    public Book(int bookId, String title, String author) {
+        this.bookId = bookId;
+        this.title = title;
+        this.author = author;
+    }
+
+    public int getBookId() { return bookId; }
+    public String getTitle() { return title; }
+    public String getAuthor() { return author; }
+    
+    public abstract void displayInfo();
+}
+
+class Library implements LibraryOperations {
+    private ArrayList<Book> books = new ArrayList<>();
+    private ArrayList<Book> borrowedBooks = new ArrayList<>();
+
+    @Override
+    public void addBook(Book book) {
+        books.add(book);
+        System.out.println("Book added successfully!");
+    }
+
+    @Override
+    public void borrowBook(int bookId) {
+        for (Book book : books) {
+            if (book.getBookId() == bookId) {
+                books.remove(book);
+                borrowedBooks.add(book);
+                System.out.println("You have borrowed: " + book.getTitle());
+                return;
+            }
+        }
+        System.out.println("Book not available.");
+    }
+
+    @Override
+    public void returnBook(int bookId) {
+        for (Book book : borrowedBooks) {
+            if (book.getBookId() == bookId) {
+                borrowedBooks.remove(book);
+                books.add(book);
+                System.out.println("Book returned successfully!");
+                return;
+            }
+        }
+        System.out.println("Invalid book ID.");
+    }
+
+    @Override
+    public void viewBooks() {
+        if (books.isEmpty()) {
+            System.out.println("No books available.");
+            return;
+        }
+        System.out.println("Available Books:");
+        for (Book book : books) {
+            book.displayInfo();
+        }
+    }
+}
+
+class LibraryBook extends Book {
+    public LibraryBook(int bookId, String title, String author) {
+        super(bookId, title, author);
+    }
+
+    @Override
+    public void displayInfo() {
+        System.out.println("Book ID: " + bookId + ", Title: " + title + ", Author: " + author);
+    }
+}
+
+public class LibraryManagementSystem {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Library library = new Library();
+
+        while (true) {
+            System.out.println("\nLibrary Management System");
+            System.out.println("1. Add Book");
+            System.out.println("2. Borrow Book");
+            System.out.println("3. Return Book");
+            System.out.println("4. View Books");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            
+            int choice = scanner.nextInt();
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Book ID: ");
+                    int id = scanner.nextInt();
+                    scanner.nextLine(); 
+                    System.out.print("Enter Title: ");
+                    String title = scanner.nextLine();
+                    System.out.print("Enter Author: ");
+                    String author = scanner.nextLine();
+                    library.addBook(new LibraryBook(id, title, author));
+                    break;
+                case 2:
+                    System.out.print("Enter Book ID to borrow: ");
+                    int borrowId = scanner.nextInt();
+                    library.borrowBook(borrowId);
+                    break;
+                case 3:
+                    System.out.print("Enter Book ID to return: ");
+                    int returnId = scanner.nextInt();
+                    library.returnBook(returnId);
+                    break;
+                case 4:
+                    library.viewBooks();
+                    break;
+                case 5:
+                    System.out.println("Exiting Library Management System.");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice! Try again.");
+            }
+        }
+    }
+}
